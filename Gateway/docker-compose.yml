@@ -10,3 +10,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5230
+      - IDENTITY_URL=${IDENTITY_URL}
+      - STAKEHOLDER_URL=${STAKEHOLDER_URL}
+      - FOLLOWER_URL=${FOLLOWER_URL}
+      - TOUR_URL=${TOUR_URL}

@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Gateway.Handlers;
 using Gateway.Middlewares;
 using Gateway.Startup;
@@ -10,23 +11,29 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
+if (builder.Environment.IsDevelopment())
+{
+    Env.Load();
+}
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<AuthForwardingHandler>();
 builder.Services.AddHttpClient("Stakeholders", c=> { 
-    c.BaseAddress = new Uri("http://localhost:5227/");
+    c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("STAKEHOLDER_URL")!);
 }).AddHttpMessageHandler<AuthForwardingHandler>();
 builder.Services.AddHttpClient("Identity", c =>
 {
-    c.BaseAddress = new Uri("http://localhost:5226/");
+    c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("IDENTITY_URL")!);
 }).AddHttpMessageHandler<AuthForwardingHandler>();
 builder.Services.AddHttpClient("Followers", c =>
 {
-    c.BaseAddress = new Uri("http://localhost:5228/");
+    c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("FOLLOWER_URL")!);
 }).AddHttpMessageHandler<AuthForwardingHandler>();
 builder.Services.AddHttpClient("Tours", c =>
 {
-    c.BaseAddress = new Uri("http://localhost:5229/");
+    c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("TOUR_URL")!);
 }).AddHttpMessageHandler<AuthForwardingHandler>();
+
+builder.Services.ConfigureCors();
 
 var app = builder.Build();
 
