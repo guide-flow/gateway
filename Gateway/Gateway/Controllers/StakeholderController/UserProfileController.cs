@@ -26,7 +26,19 @@ namespace Gateway.Controllers.StakeholderController
         [HttpPost("create-user-profile")]
         public async Task<IActionResult> CreateUserProfile([FromBody] object userProfileDto)
         {
-            var response = await _client.PostAsJsonAsync("/userprofile/create-user-profile", userProfileDto);
+            var request = new HttpRequestMessage(HttpMethod.Post, "/userprofile/create-user-profile")
+            {
+                Content = JsonContent.Create(userProfileDto)
+            };
+
+            // prosledi claim headere dalje
+            foreach (var header in HttpContext.Request.Headers)
+            {
+                if (header.Key.StartsWith("X-User-"))
+                    request.Headers.Add(header.Key, header.Value.ToString());
+            }
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -35,8 +47,18 @@ namespace Gateway.Controllers.StakeholderController
         [HttpGet("user-profile")]
         public async Task<IActionResult> GetUserProfile()
         {
-            var response = await _client.GetAsync("/userprofile/user-profile");
+            var request = new HttpRequestMessage(HttpMethod.Get, "/userprofile/user-profile");
+
+            // ubaci claim headere koje je middleware stavio
+            foreach (var header in HttpContext.Request.Headers)
+            {
+                if (header.Key.StartsWith("X-User-"))
+                    request.Headers.Add(header.Key, header.Value.ToString());
+            }
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
+
             return Content(content, "application/json");
         }
 
@@ -44,8 +66,21 @@ namespace Gateway.Controllers.StakeholderController
         [HttpPut("user-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] object userProfileDto)
         {
-            var response = await _client.PutAsJsonAsync("/userprofile/user-profile", userProfileDto);
+            var request = new HttpRequestMessage(HttpMethod.Put, "/userprofile/user-profile")
+            {
+                Content = JsonContent.Create(userProfileDto)
+            };
+
+            // ubaci claim headere koje je middleware popunio
+            foreach (var header in HttpContext.Request.Headers)
+            {
+                if (header.Key.StartsWith("X-User-"))
+                    request.Headers.Add(header.Key, header.Value.ToString());
+            }
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
+
             return Content(content, "application/json");
         }
     }

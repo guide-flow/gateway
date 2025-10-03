@@ -46,6 +46,21 @@ namespace Gateway.Middlewares
                 return;
             }
 
+            var content = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+
+            // ubacujemo claimove kao headere
+            if (content != null)
+            {
+                if (content.TryGetValue("sub", out var userId))
+                    context.Request.Headers["X-User-Id"] = userId;
+
+                if (content.TryGetValue("email", out var email))
+                    context.Request.Headers["X-User-Email"] = email;
+
+                if (content.TryGetValue("role", out var role))
+                    context.Request.Headers["X-User-Role"] = role;
+            }
+
             // ako token valja -> pusti dalje
             await _next(context);
         }
