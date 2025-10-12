@@ -18,7 +18,7 @@ namespace Gateway.ProtoControllers
             _client = client;
         }
 
-        public override async Task<Tour> CreateTour(CreateUpdateTour request, ServerCallContext context)
+        public override async Task<Tour> CreateTour(CreateTourRequest request, ServerCallContext context)
         {
             var httpCtx = context.GetHttpContext();
             var meta = new Metadata();
@@ -31,6 +31,28 @@ namespace Gateway.ProtoControllers
             try
             {
                 var resp = await _client.CreateTourAsync(request, headers: meta);
+                return resp;
+            }
+            catch (RpcException ex)
+            {
+                _logger.LogError(ex, "CreateTour downstream call failed: {Status} {Detail}", ex.Status, ex.Status.Detail);
+                throw;
+            }
+        }
+
+        public override async Task<Tour> UpdateTour(UpdateTourRequest request, ServerCallContext context)
+        {
+            var httpCtx = context.GetHttpContext();
+            var meta = new Metadata();
+
+            if (httpCtx.Request.Headers.TryGetValue("X-User-Id", out var id)) meta.Add("x-user-id", id.ToString());
+            if (httpCtx.Request.Headers.TryGetValue("X-User-Email", out var email)) meta.Add("x-user-email", email.ToString());
+            if (httpCtx.Request.Headers.TryGetValue("X-User-Role", out var role)) meta.Add("x-user-role", role.ToString());
+
+            _logger.LogInformation($"Request:{request}");
+            try
+            {
+                var resp = await _client.UpdateTourAsync(request, headers: meta);
                 return resp;
             }
             catch (RpcException ex)
