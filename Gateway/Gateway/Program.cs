@@ -67,9 +67,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-app.UseMiddleware<IdentityValidationMiddleware>();
+//app.UseMiddleware<IdentityValidationMiddleware>();
 app.MapControllers();
 
 app.MapGrpcService<TourProtoController>();
+
+app.MapGrpcService<ShoppingCartProtoController>();
 
 app.Run();
