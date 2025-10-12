@@ -1,7 +1,9 @@
-using DotNetEnv;
+﻿using DotNetEnv;
 using Gateway.Handlers;
 using Gateway.Middlewares;
+using Gateway.ProtoControllers;
 using Gateway.Startup;
+using GrpcServiceTranscoding.Tours;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,8 @@ if (builder.Environment.IsDevelopment())
 }
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<AuthForwardingHandler>();
-builder.Services.AddHttpClient("Stakeholders", c=> { 
+builder.Services.AddHttpClient("Stakeholders", c =>
+{
     c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("STAKEHOLDER_URL")!);
 }).AddHttpMessageHandler<AuthForwardingHandler>();
 builder.Services.AddHttpClient("Identity", c =>
@@ -35,6 +38,23 @@ builder.Services.AddHttpClient("Tours", c =>
 
 builder.Services.ConfigureCors();
 
+builder.Services.AddGrpc().AddJsonTranscoding();
+
+builder.Services
+  .AddGrpcClient<ToursService.ToursServiceClient>(o =>
+  {
+      o.Address = new Uri(Environment.GetEnvironmentVariable("TOUR_URL") ?? "https://tour:7029");
+  })
+  .ConfigurePrimaryHttpMessageHandler(() =>
+  {
+      var h = new HttpClientHandler();
+      h.ServerCertificateCustomValidationCallback =
+          HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+      return h;
+  });
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -49,5 +69,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseMiddleware<IdentityValidationMiddleware>();
 app.MapControllers();
+
+app.MapGrpcService<TourProtoController>();
 
 app.Run();

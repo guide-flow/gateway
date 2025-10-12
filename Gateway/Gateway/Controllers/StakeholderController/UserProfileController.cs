@@ -3,7 +3,7 @@
 namespace Gateway.Controllers.StakeholderController
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/user-profiles")]
     public class UserProfileController : ControllerBase
     {
         private readonly HttpClient _client;
