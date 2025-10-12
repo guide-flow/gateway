@@ -20,9 +20,15 @@ public class ShoppingCartProtoController : ShoppingCartService.ShoppingCartServi
         httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
         var channel = GrpcChannel.ForAddress("https://localhost:7029", new GrpcChannelOptions { HttpHandler = httpHandler });
 
+        var httpCtx = context.GetHttpContext();
+        var meta = new Metadata();
+
+        if (httpCtx.Request.Headers.TryGetValue("X-User-Id", out var id)) meta.Add("x-user-id", id.ToString());
+        if (httpCtx.Request.Headers.TryGetValue("X-User-Email", out var email)) meta.Add("x-user-email", email.ToString());
+        if (httpCtx.Request.Headers.TryGetValue("X-User-Role", out var role)) meta.Add("x-user-role", role.ToString());
 
         var client = new ShoppingCartService.ShoppingCartServiceClient(channel);
-        var response = await client.AddToCartAsync(request);
+        var response = await client.AddToCartAsync(request, headers: meta);
         return response;
     }
 
@@ -32,9 +38,15 @@ public class ShoppingCartProtoController : ShoppingCartService.ShoppingCartServi
         httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
         var channel = GrpcChannel.ForAddress("https://localhost:7029", new GrpcChannelOptions { HttpHandler = httpHandler });
 
+        var httpCtx = context.GetHttpContext();
+        var meta = new Metadata();
+
+        if (httpCtx.Request.Headers.TryGetValue("X-User-Id", out var id)) meta.Add("x-user-id", id.ToString());
+        if (httpCtx.Request.Headers.TryGetValue("X-User-Email", out var email)) meta.Add("x-user-email", email.ToString());
+        if (httpCtx.Request.Headers.TryGetValue("X-User-Role", out var role)) meta.Add("x-user-role", role.ToString());
 
         var client = new ShoppingCartService.ShoppingCartServiceClient(channel);
-        var response = await client.RemoveFromCartAsync(request);
+        var response = await client.RemoveFromCartAsync(request, headers: meta);
         return response;
     }
 }
