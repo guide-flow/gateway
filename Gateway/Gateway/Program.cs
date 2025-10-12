@@ -33,7 +33,7 @@ builder.Services.AddHttpClient("Followers", c =>
 }).AddHttpMessageHandler<AuthForwardingHandler>();
 builder.Services.AddHttpClient("Tours", c =>
 {
-    c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("TOUR_URL")!);
+    c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("TOUR_HTTP_URL")!);
 }).AddHttpMessageHandler<AuthForwardingHandler>();
 
 builder.Services.ConfigureCors();
@@ -43,7 +43,7 @@ builder.Services.AddGrpc().AddJsonTranscoding();
 builder.Services
   .AddGrpcClient<ToursService.ToursServiceClient>(o =>
   {
-      o.Address = new Uri(Environment.GetEnvironmentVariable("TOUR_URL") ?? "https://tour:7029");
+      o.Address = new Uri(Environment.GetEnvironmentVariable("TOUR_HTTPS_URL") ?? "https://tour:7029");
   })
   .ConfigurePrimaryHttpMessageHandler(() =>
   {
@@ -64,7 +64,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
+app.UseCors("_allowDevClients");
 
 app.UseAuthorization();
 app.UseMiddleware<IdentityValidationMiddleware>();
