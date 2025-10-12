@@ -3,7 +3,7 @@
 namespace Gateway.Controllers.TourController
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/tours")]
     public class TourController : ControllerBase
     {
         private readonly HttpClient _client;

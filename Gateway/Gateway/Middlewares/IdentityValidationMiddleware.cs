@@ -16,6 +16,13 @@ namespace Gateway.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             var path = context.Request.Path.Value?.ToLower();
+            var isStartingPath = path?.StartsWith("/");
+
+            if (isStartingPath.HasValue && !isStartingPath.Value)
+            {
+                await _next(context);
+                return;
+            }
 
             if (path != null &&
                 (path.Contains("/api/authentication/register") ||

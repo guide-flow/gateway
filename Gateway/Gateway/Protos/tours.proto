@@ -1,0 +1,52 @@
+﻿syntax = "proto3";
+
+package Tours;
+option csharp_namespace = "GrpcServiceTranscoding.Tours";
+
+import "Protos/google/api/annotations.proto";
+import "Protos/google/api/http.proto";
+
+// Servis
+service ToursService {
+  rpc CreateTour(CreateUpdateTour) returns (Tour) {
+    option (google.api.http) = {
+      post: "/tours"
+      body: "*"        
+    };
+  }
+}
+
+message CreateUpdateTour {            
+  string title = 1;             
+  string description = 2;       
+  TourDifficulty difficulty = 3;
+  repeated Tag tags = 4;        
+}
+
+message Tag {
+  int32 id = 1;
+  string name = 2;
+}
+
+message Tour {
+  int32 id = 1;
+  string title = 2;
+  string description = 3;
+  TourDifficulty difficulty = 4;
+  repeated Tag tags = 5;
+  double price = 6;      
+  TourStatus status = 7;
+  string author_id = 8;
+}
+
+enum TourDifficulty {
+  EASY = 0;
+  MEDIUM = 1;
+  HARD = 2;
+}
+
+enum TourStatus {
+  DRAFT = 0;
+  PUBLISHED = 1;
+  ARCHIVED = 2;
+}

@@ -3,7 +3,7 @@
 namespace Gateway.Controllers.FollowerController
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/followers")]
     public class FollowersController : ControllerBase
     {
         private readonly HttpClient _client;
