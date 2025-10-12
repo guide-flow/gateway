@@ -3,6 +3,7 @@ syntax = "proto3";
 option csharp_namespace = "Gateway.Protos";
 
 import "Protos/google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 package ShoppingCart;
 
@@ -11,6 +12,12 @@ service ShoppingCartService {
 		option (google.api.http) = {
 			post: "/shopping-cart"
 			body: "*"
+		};
+	}
+
+	rpc RemoveFromCart (ShoppingCartItemId) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			delete: "/shopping-cart/{tour_id}"
 		};
 	}
 }
@@ -34,4 +41,8 @@ message ShoppingCartItem {
 	int32 tour_id = 3;
 	string tour_name = 4;
 	double price = 5;
+}
+
+message ShoppingCartItemId {
+	int32 tour_id = 1;
 }
