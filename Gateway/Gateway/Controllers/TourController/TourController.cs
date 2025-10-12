@@ -17,7 +17,7 @@ namespace Gateway.Controllers.TourController
         [HttpPost]
         public async Task<IActionResult> CreateTour([FromBody] object tourDto)
         {
-            var response = await _client.PostAsJsonAsync("/tour", tourDto);
+            var response = await _client.PostAsJsonAsync("api/tours", tourDto);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -26,7 +26,7 @@ namespace Gateway.Controllers.TourController
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTourById(int id)
         {
-            var response = await _client.GetAsync($"/tour/{id}");
+            var response = await _client.GetAsync($"api/tours/{id}");
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -35,7 +35,7 @@ namespace Gateway.Controllers.TourController
         [HttpGet("author")]
         public async Task<IActionResult> GetToursByAuthor()
         {
-            var response = await _client.GetAsync("/tour/author");
+            var response = await _client.GetAsync("api/tours/author");
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -44,7 +44,7 @@ namespace Gateway.Controllers.TourController
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTour(int id, [FromBody] object tourDto)
         {
-            var response = await _client.PutAsJsonAsync($"/tour/{id}", tourDto);
+            var response = await _client.PutAsJsonAsync($"api/tours/{id}", tourDto);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }

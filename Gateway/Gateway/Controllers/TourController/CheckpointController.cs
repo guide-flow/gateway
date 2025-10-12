@@ -17,7 +17,7 @@ namespace Gateway.Controllers.TourController
         [HttpPost]
         public async Task<IActionResult> CreateCheckpoint([FromBody] object checkpointDto)
         {
-            var response = await _client.PostAsJsonAsync("/checkpoint", checkpointDto);
+            var response = await _client.PostAsJsonAsync("api/checkpoints", checkpointDto);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -26,7 +26,7 @@ namespace Gateway.Controllers.TourController
         [HttpGet("tour-checkpoints/{tourId}")]
         public async Task<IActionResult> GetTourCheckpoints(int tourId)
         {
-            var response = await _client.GetAsync($"/checkpoint/tour-checkpoints/{tourId}");
+            var response = await _client.GetAsync($"api/checkpoints/tour-checkpoints/{tourId}");
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -35,7 +35,7 @@ namespace Gateway.Controllers.TourController
         [HttpGet("{checkpointId}")]
         public async Task<IActionResult> GetCheckpoint(int checkpointId)
         {
-            var response = await _client.GetAsync($"/checkpoint/checkpoint/{checkpointId}");
+            var response = await _client.GetAsync($"api/checkpoints/checkpoint/{checkpointId}");
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -43,7 +43,7 @@ namespace Gateway.Controllers.TourController
         [HttpDelete("{checkpointId}")]
         public async Task<IActionResult> DeleteCheckpoint(int checkpointId)
         {
-            var response = await _client.DeleteAsync($"/checkpoint?checkpointId={checkpointId}");
+            var response = await _client.DeleteAsync($"api/checkpoints/{checkpointId}");
             var content = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
                 return Ok(content);
@@ -54,7 +54,7 @@ namespace Gateway.Controllers.TourController
         [HttpPut]
         public async Task<IActionResult> UpdateCheckpoint([FromBody] object checkpointDto)
         {
-            var response = await _client.PutAsJsonAsync("/checkpoint", checkpointDto);
+            var response = await _client.PutAsJsonAsync("api/checkpoints", checkpointDto);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
