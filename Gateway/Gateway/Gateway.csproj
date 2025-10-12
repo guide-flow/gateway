@@ -24,6 +24,7 @@
 	<ItemGroup>
 		<Folder Include="Controllers\BlogController\" />
 		<Protobuf Include="Protos\tours.proto" />
+		<Protobuf Include="Protos\shopping-cart.proto" />
 	</ItemGroup>
 
 </Project>
