@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http;
+using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Gateway.Controllers.TourController
 {
@@ -13,11 +15,26 @@ namespace Gateway.Controllers.TourController
             _client = httpClientFactory.CreateClient("Tours");
         }
 
+        private void AddUserHeaders(HttpRequestMessage req)
+        {
+            foreach (var header in HttpContext.Request.Headers)
+            {
+                if (header.Key.StartsWith("X-User-", StringComparison.OrdinalIgnoreCase))
+                    req.Headers.TryAddWithoutValidation(header.Key, header.Value.ToString());
+            }
+        }
+
         // POST: api/checkpoints
         [HttpPost]
         public async Task<IActionResult> CreateCheckpoint([FromBody] object checkpointDto)
         {
-            var response = await _client.PostAsJsonAsync("api/checkpoints", checkpointDto);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/checkpoints")
+            {
+                Content = JsonContent.Create(checkpointDto)
+            };
+            AddUserHeaders(request);
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -26,7 +43,10 @@ namespace Gateway.Controllers.TourController
         [HttpGet("tour-checkpoints/{tourId}")]
         public async Task<IActionResult> GetTourCheckpoints(int tourId)
         {
-            var response = await _client.GetAsync($"api/checkpoints/tour-checkpoints/{tourId}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/checkpoints/tour-checkpoints/{tourId}");
+            AddUserHeaders(request);
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
@@ -35,18 +55,25 @@ namespace Gateway.Controllers.TourController
         [HttpGet("{checkpointId}")]
         public async Task<IActionResult> GetCheckpoint(int checkpointId)
         {
-            var response = await _client.GetAsync($"api/checkpoints/checkpoint/{checkpointId}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/checkpoints/checkpoint/{checkpointId}");
+            AddUserHeaders(request);
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
+
         // DELETE: api/checkpoints/{checkpointId}
         [HttpDelete("{checkpointId}")]
         public async Task<IActionResult> DeleteCheckpoint(int checkpointId)
         {
-            var response = await _client.DeleteAsync($"api/checkpoints/{checkpointId}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/checkpoints/{checkpointId}");
+            AddUserHeaders(request);
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-                return Ok(content);
+
+            // može i Ok(content), ali radi konzistentnosti vraćam JSON content
             return Content(content, "application/json");
         }
 
@@ -54,7 +81,13 @@ namespace Gateway.Controllers.TourController
         [HttpPut]
         public async Task<IActionResult> UpdateCheckpoint([FromBody] object checkpointDto)
         {
-            var response = await _client.PutAsJsonAsync("api/checkpoints", checkpointDto);
+            var request = new HttpRequestMessage(HttpMethod.Put, "api/checkpoints")
+            {
+                Content = JsonContent.Create(checkpointDto)
+            };
+            AddUserHeaders(request);
+
+            var response = await _client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
