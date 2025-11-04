@@ -34,28 +34,28 @@ namespace Gateway.Controllers.FollowerController
         }
 
         // GET: api/followers/following
-        [HttpGet("following")]
-        public async Task<IActionResult> GetFollowing()
+        [HttpGet("following/{id}")]
+        public async Task<IActionResult> GetFollowing(string id)
         {
-            var response = await _client.GetAsync("/follow/following");
+            var response = await _client.GetAsync($"/follow/following/{id}");
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
 
         // GET: api/followers/followers
-        [HttpGet("followers")]
-        public async Task<IActionResult> GetFollowers()
+        [HttpGet("followers/{id}")]
+        public async Task<IActionResult> GetFollowers(string id)
         {
-            var response = await _client.GetAsync("/follow/followers");
+            var response = await _client.GetAsync($"/follow/followers/{id}");
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
 
         // GET: api/followers/recommendations
-        [HttpGet("recommendations")]
-        public async Task<IActionResult> GetRecommendations()
+        [HttpGet("recommendations/{id}")]
+        public async Task<IActionResult> GetRecommendations(string id)
         {
-            var response = await _client.GetAsync("/follow/recommendations");
+            var response = await _client.GetAsync($"/follow/recommendations/{id}");
             var content = await response.Content.ReadAsStringAsync();
             return Content(content, "application/json");
         }
