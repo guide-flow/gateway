@@ -5,6 +5,9 @@ using Gateway.ProtoControllers;
 using Gateway.Startup;
 using GrpcServiceTranscoding.Tours;
 
+// Enable HTTP/2 without TLS for gRPC clients (required for non-HTTPS gRPC)
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
