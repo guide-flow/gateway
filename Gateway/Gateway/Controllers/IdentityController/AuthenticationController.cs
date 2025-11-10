@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text;
-using System.Text.Json;
 
 namespace Gateway.Controllers.IdentityController
 {
@@ -9,11 +8,6 @@ namespace Gateway.Controllers.IdentityController
     public class AuthenticationController : ControllerBase
     {
         private readonly HttpClient _client;
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-        };
 
         public AuthenticationController(IHttpClientFactory httpClientFactory)
         {
@@ -22,24 +16,34 @@ namespace Gateway.Controllers.IdentityController
 
         // POST: api/identity/authentication/register
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] object registrationCreds)
+        public async Task<IActionResult> Register()
         {
-            var json = JsonSerializer.Serialize(registrationCreds, JsonOptions);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var reader = new StreamReader(Request.Body);
+            var body = await reader.ReadToEndAsync();
+            var content = new StringContent(body, Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("/api/authentication/register", content);
             var responseContent = await response.Content.ReadAsStringAsync();
-            return Content(responseContent, "application/json");
+
+            if (response.IsSuccessStatusCode)
+                return Ok(await response.Content.ReadFromJsonAsync<object>());
+
+            return StatusCode((int)response.StatusCode, responseContent);
         }
 
         // POST: api/identity/authentication/authenticate
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] object authenticationRequest)
+        public async Task<IActionResult> Authenticate()
         {
-            var json = JsonSerializer.Serialize(authenticationRequest, JsonOptions);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var reader = new StreamReader(Request.Body);
+            var body = await reader.ReadToEndAsync();
+            var content = new StringContent(body, Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("/api/authentication/authenticate", content);
             var responseContent = await response.Content.ReadAsStringAsync();
-            return Content(responseContent, "application/json");
+
+            if (response.IsSuccessStatusCode)
+                return Ok(await response.Content.ReadFromJsonAsync<object>());
+
+            return StatusCode((int)response.StatusCode, responseContent);
         }
     }
 }
