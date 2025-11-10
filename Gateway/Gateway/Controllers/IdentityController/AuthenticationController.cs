@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Text.Json;
 
 namespace Gateway.Controllers.IdentityController
 {
@@ -7,6 +9,11 @@ namespace Gateway.Controllers.IdentityController
     public class AuthenticationController : ControllerBase
     {
         private readonly HttpClient _client;
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+        };
 
         public AuthenticationController(IHttpClientFactory httpClientFactory)
         {
@@ -17,18 +24,22 @@ namespace Gateway.Controllers.IdentityController
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] object registrationCreds)
         {
-            var response = await _client.PostAsJsonAsync("/api/authentication/register", registrationCreds);
-            var content = await response.Content.ReadAsStringAsync();
-            return Content(content, "application/json");
+            var json = JsonSerializer.Serialize(registrationCreds, JsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync("/api/authentication/register", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return Content(responseContent, "application/json");
         }
 
         // POST: api/identity/authentication/authenticate
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] object authenticationRequest)
         {
-            var response = await _client.PostAsJsonAsync("/api/authentication/authenticate", authenticationRequest);
-            var content = await response.Content.ReadAsStringAsync();
-            return Content(content, "application/json");
+            var json = JsonSerializer.Serialize(authenticationRequest, JsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync("/api/authentication/authenticate", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return Content(responseContent, "application/json");
         }
     }
 }

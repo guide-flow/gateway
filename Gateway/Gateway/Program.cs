@@ -12,7 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
@@ -29,7 +34,13 @@ builder.Services.AddHttpClient("Stakeholders", c =>
 builder.Services.AddHttpClient("Identity", c =>
 {
     c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("IDENTITY_URL")!);
-}).AddHttpMessageHandler<AuthForwardingHandler>();
+})
+.AddHttpMessageHandler<AuthForwardingHandler>()
+.ConfigureHttpClient(client =>
+{
+    client.DefaultRequestHeaders.Accept.Clear();
+    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+});
 builder.Services.AddHttpClient("Followers", c =>
 {
     c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("FOLLOWER_URL")!);
@@ -71,8 +82,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("_allowDevClients");
 
-app.UseAuthorization();
 app.UseMiddleware<IdentityValidationMiddleware>();
+app.UseAuthorization();
 app.MapControllers();
 
 app.MapGrpcService<TourProtoController>();
