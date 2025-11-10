@@ -10,7 +10,7 @@ env:
   IMAGE_NAME: gateway
   AKS_NAMESPACE: soa-app
   DEPLOYMENT_NAME: gateway
-  BUILD_CONTEXT: Gateway/Gateway
+  BUILD_CONTEXT: Gateway
 
 jobs:
   build-and-deploy:
@@ -43,7 +43,7 @@ jobs:
       - name: Build and push Docker image
         working-directory: ${{ env.BUILD_CONTEXT }}
         run: |
-          docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
+          docker build -f Gateway/Dockerfile -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Set up kubectl
