@@ -77,6 +77,22 @@ namespace Gateway.Controllers.StakeholderController
             return Content(content, "application/json");
         }
 
+        // GET: api/user-profiles/all
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUserProfiles()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "/userprofile/all");
+            // ubaci claim headere koje je middleware stavio
+            foreach (var header in HttpContext.Request.Headers)
+            {
+                if (header.Key.StartsWith("X-User-"))
+                    request.Headers.Add(header.Key, header.Value.ToString());
+            }
+            var response = await _client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+            return Content(content, "application/json");
+        }
+
         // PUT: api/stakeholders/user-profile
         [HttpPut("user-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] object userProfileDto)
