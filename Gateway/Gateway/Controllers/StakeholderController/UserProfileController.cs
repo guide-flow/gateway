@@ -98,5 +98,20 @@ namespace Gateway.Controllers.StakeholderController
 
             return Content(content, "application/json");
         }
+
+        // GET: api/user-profiles/images/{**path} - Proxy for static images
+        [HttpGet("images/{**path}")]
+        public async Task<IActionResult> GetImage(string path)
+        {
+            var response = await _client.GetAsync($"/images/{path}");
+
+            if (!response.IsSuccessStatusCode)
+                return NotFound();
+
+            var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+
+            return File(bytes, contentType);
+        }
     }
 }
