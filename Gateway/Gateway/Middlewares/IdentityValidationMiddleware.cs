@@ -27,7 +27,7 @@ namespace Gateway.Middlewares
             if (path != null &&
                 (path.Contains("/api/authentication/register") ||
                 path.Contains("/api/authentication/authenticate") ||
-                path.Contains("/user-profiles/images/")))
+                path.Contains("/api/user-profiles/images/")))
             {
                 await _next(context);
                 return;
