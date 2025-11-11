@@ -34,13 +34,7 @@ builder.Services.AddHttpClient("Stakeholders", c =>
 builder.Services.AddHttpClient("Identity", c =>
 {
     c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("IDENTITY_URL")!);
-})
-.AddHttpMessageHandler<AuthForwardingHandler>()
-.ConfigureHttpClient(client =>
-{
-    client.DefaultRequestHeaders.Accept.Clear();
-    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-});
+}).AddHttpMessageHandler<AuthForwardingHandler>();
 builder.Services.AddHttpClient("Followers", c =>
 {
     c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("FOLLOWER_URL")!);
