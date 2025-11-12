@@ -63,6 +63,21 @@ namespace Gateway.Controllers.TourController
             return Content(content, "application/json");
         }
 
+        // POST: api/tours/by-authors
+        [HttpPost("by-authors")]
+        public async Task<IActionResult> GetToursByAuthors([FromBody] object authorIds)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/tours/by-authors")
+            {
+                Content = JsonContent.Create(authorIds)
+            };
+            AddUserHeaders(request);
+
+            var response = await _client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+            return Content(content, "application/json");
+        }
+
         // PUT: api/tours/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTour(int id, [FromBody] object tourDto)
